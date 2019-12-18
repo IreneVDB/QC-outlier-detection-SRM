@@ -290,7 +290,7 @@ identify.outliers.QC.IR <- function(df, Thresholds.IR){
     select(-n.failQC)
 
   # subsets with IR outliers:
-  Outlier.IR <- lapply(unique(df$Peptide), function(Pep) {
+  Outlier.IR <- lapply(unique(Thresholds.IR$Peptide), function(Pep) {
       bind_rows(df %>%
                   filter(Peptide == Pep,
                   Peptide_Day %in% FailQC$Peptide_Day |
@@ -314,7 +314,7 @@ identify.outliers.QC.IR <- function(df, Thresholds.IR){
     }) %>%
     bind_rows()
   
-  IR.Q2 <- lapply(unique(df$Peptide), function(Pep){
+  IR.Q2 <- lapply(unique(Thresholds.IR$Peptide), function(Pep){
     Outlier.IR %>%
       filter(Peptide == Pep,
              No == 1,
@@ -396,7 +396,7 @@ define.PR.thresholds <- function(df){
 }
 # Create column to define outliers for Peptide Ratio
 identify.outliers.PR <- function(df, Thresholds.PR) {
-  PR.outlier <- bind_rows(lapply(unique(df$Protein), function(Prot){
+  PR.outlier <- bind_rows(lapply(unique(Thresholds.PR$Protein), function(Prot){
     df %>%
       filter(Protein == Prot,
              Type == "QUAN",
@@ -432,12 +432,12 @@ define.duplicate.thresholds <- function(df){
 }
 # Identify outliers for duplicates:
 identify.outliers.duplicate <- function(df, Thresholds.Duplicate) {
-  Duplicate.outlier.Tier1 <- bind_rows(lapply(unique(df$Peptide), function(Pep){
+  Duplicate.outlier.Tier1 <- bind_rows(lapply(unique(Thresholds.Duplicate$Peptide), function(Pep){
     df %>%
       filter(Peptide == Pep,
              Diff.Mean >= subset(Thresholds.Duplicate, Peptide == Pep)$Tier1.threshold)
       }))
-  Duplicate.outlier.Tier2 <- bind_rows(lapply(unique(df$Peptide), function(Pep){
+  Duplicate.outlier.Tier2 <- bind_rows(lapply(unique(Thresholds.Duplicate$Peptide), function(Pep){
     df %>%
       filter(Peptide == Pep,
              Diff.Mean >= subset(Thresholds.Duplicate, Peptide == Pep)$Tier2.threshold)
@@ -613,3 +613,4 @@ write.csv(bind_rows(Results.withsingle[["results.Duplicate.Tier1"]],
                     Results.withsingle[["results.widows.Tier2"]],
                     .id = "Tier"),
           here("data/ResultswithSingles.csv"), row.names = FALSE)
+
